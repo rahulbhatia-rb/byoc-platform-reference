@@ -1,0 +1,26 @@
+name: Terraform checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+      - name: Check formatting
+        run: terraform fmt -check -recursive
+      - name: Initialize example without state backend
+        working-directory: examples/aws-byoc
+        run: terraform init -backend=false
+      - name: Validate example
+        working-directory: examples/aws-byoc
+        run: terraform validate
